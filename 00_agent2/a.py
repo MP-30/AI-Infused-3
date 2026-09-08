@@ -3,14 +3,11 @@ from dotenv import load_dotenv, find_dotenv
 from langchain_groq import ChatGroq
 from langchain.agents import create_agent
 
-
 load_dotenv(find_dotenv(), override=True)
-
 
 PROVIDER = "groq"
 MODEL = "openai/gpt-oss-120b"
 REQUIRED_KEY = "GROQ_API_KEY"
-
 api_key = os.environ.get(REQUIRED_KEY)
 
 if not api_key:
@@ -25,20 +22,16 @@ print(
     f"API key loaded={bool(api_key)}"
 )
 
-
 model = ChatGroq(
     model=MODEL,
     temperature=0,
     api_key=api_key,
 )
 
-
 # ---------------------------------------------------------------------------
 # Tools
-#
 # Type hints:
 #     Tell the model what arguments the tool expects.
-#
 # Docstrings:
 #     Tell the model what the tool does and when it should be used.
 # ---------------------------------------------------------------------------
@@ -47,44 +40,28 @@ def get_weather(city: str) -> str:
     """Get the current weather for a given city."""
     return f"The weather in {city} is sunny, 28 degrees C."
 
-
 def add(a: float, b: float) -> float:
     """Add two numbers together."""
     return a + b
-
 
 def multiply(a: float, b: float) -> float:
     """Multiply two numbers together."""
     return a * b
 
-
 def get_population(city: str) -> str:
     """Get the approximate population of a major city."""
-
     data = {
         "new york": "8.5 million",
         "london": "9 million",
         "bangalore": "13 million",
         "tokyo": "14 million",
     }
-
     return data.get(
         city.lower(),
         f"Sorry, I don't have population data for {city}.",
     )
 
-
-TOOLS = [
-    get_weather,
-    add,
-    multiply,
-    get_population,
-]
-
-
-# ---------------------------------------------------------------------------
-# Create Agent
-# ---------------------------------------------------------------------------
+TOOLS = [get_weather, add, multiply, get_population,]
 
 agent = create_agent(
     model=model,
@@ -96,13 +73,7 @@ agent = create_agent(
     ),
 )
 
-
-# ---------------------------------------------------------------------------
-# Run the agent
-# ---------------------------------------------------------------------------
-
 def ask(question: str, show_steps: bool = True) -> None:
-
     response = agent.invoke(
         {
             "messages": [
@@ -113,9 +84,7 @@ def ask(question: str, show_steps: bool = True) -> None:
             ]
         }
     )
-
     print(f"\nQ: {question}")
-
     if show_steps:
         for message in response["messages"]:
             # AI requested a tool
@@ -134,11 +103,6 @@ def ask(question: str, show_steps: bool = True) -> None:
                     f"   [tool result] {message.content}"
                 )
     print(f"A: {response['messages'][-1].content}")
-
-
-# ---------------------------------------------------------------------------
-# Demo
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
 
